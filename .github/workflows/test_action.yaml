@@ -35,8 +35,11 @@ jobs:
         env:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
         run: echo "$MATRIX_CONTEXT"
-
       - name: Show default environment variables
         run: |
           echo "The git ref is: ${{ github.ref }}"
           echo "The git ref name is: ${{ github.ref_name }}"
+      - name: Show set env variable
+        env:
+          HUGO_ENV: ${{ github.ref_name == 'main' && 'production' || github.event_name == 'release' && 'production' || 'development' }}
+        run: echo "The hugo env is - $HUGO_ENV"
