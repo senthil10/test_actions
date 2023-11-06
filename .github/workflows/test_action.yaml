@@ -41,5 +41,5 @@ jobs:
           echo "The git ref name is: ${{ github.ref_name }}"
       - name: Show set env variable
         env:
-          HUGO_ENV: ${{ github.ref_name == "main" && "production" || github.event_name == "release" && "production" || "development" }}
+          HUGO_ENV: ${{ github.ref_name == 'main' && 'production' || github.event_name == 'release' && 'production' || 'development' }}
         run: echo "The hugo env is - $HUGO_ENV"
