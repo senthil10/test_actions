@@ -45,5 +45,6 @@ jobs:
         run: echo "The hugo env is - $HUGO_ENV"
       - name: Show custom variables
         run: |
+          echo "This is Hugo env - ${{ github.event_name == 'release' && format('{0}-{1}', 'production', github.ref_name) || github.ref_name == 'main' && format('{0}-{1}', 'production', github.sha) || format('{0}-{1}', 'development', github.sha) }}"
           echo "This is what the version is ${{ github.event_name == 'release' && github.ref_name || github.sha }}"
           echo "The git ref name is: ${{ github.ref_name }}"
