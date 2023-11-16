@@ -35,6 +35,10 @@ jobs:
         env:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
         run: echo "$MATRIX_CONTEXT"
+      - name: Dump output context
+        env:
+          OUTPUT_CONTEXT: ${{ toJson(steps.meta.outputs) }}
+        run: echo "$OUTPUT_CONTEXT"
       - name: Show default environment variables
         run: |
           echo "The git ref is: ${{ github.ref }}"
