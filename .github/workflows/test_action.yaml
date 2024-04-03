@@ -11,18 +11,16 @@ jobs:
   one:
     runs-on: ubuntu-latest
     steps:
-       - name: Check out the repo
-         uses: actions/checkout@v3
-       - name: Test Git commands
-         run: |
-           git remote set-url origin ${{ secrets.ssh }}
-           git remote -v
-           git branch
-           
-#      - name: Dump GitHub context
-#        env:
-#          GITHUB_CONTEXT: ${{ toJson(github) }}
-#        run: echo "$GITHUB_CONTEXT"
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - name: Test Git commands
+        run: |
+          git remote -v
+          git branch           
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
 #      - name: Dump job context
 #        env:
 #          JOB_CONTEXT: ${{ toJson(job) }}
