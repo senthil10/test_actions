@@ -8,8 +8,10 @@ on:
     types: [published]
 
 jobs:
-  one:
+  update_index_file:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
