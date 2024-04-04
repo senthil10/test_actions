@@ -30,7 +30,7 @@ jobs:
           git config --local user.name  ${{ github.actor }}        
           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add EBI/update_index_json.py
+          git add EBI/pathogens_portal_index.json
           git commit -m "EBI index updated"
           git push origin develop
       - name: Make pull request to main branch
