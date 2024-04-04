@@ -1,35 +1,40 @@
-name: Test actions
+name: Update EBI index
 on:
   push:
     branches:
-      - main
+    - main
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
-  update_index_file:
+  update_ebi_index:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
     steps:
+      - name: Store today date for further use
+        id: today
+        run: echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
       - name: Check out the repo
         uses: actions/checkout@v3
         with:
           ref: develop
-      - name: Set local git config
+      - name: Run python script to get new dates
+        id: index_updater
+        run: echo "status=$(python EBI/update_index_json.py --release ${{ github.ref_name }} --release-date ${{ steps.today.outputs.date }})" >> $GITHUB_OUTPUT
+      - name: Commit new change and push to develop branch
+        if: ${{ steps.index_updater.outputs.status == 'updated' }}
         run: |
-          git branch
           git config --local user.name  ${{ github.actor }}        
           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-      - name: Update the file and push to develop
-        run: |
-          echo "This is a test file updated" > test_file.txt
-          git add test_file.txt
-          git commit -m "Action file update"
+          git add EBI/pathogens_portal_index.json
+          git commit -m "EBI index updated"
           git push origin develop
       - name: Make pull request to main branch
+        if: ${{ steps.index_updater.outputs.status == 'updated' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr create --base main --head develop --title "Action PR" --body "Updating the file"
+        run: gh pr create --base main --head develop --title "Update EBI index - ${{ steps.today.outputs.date }}" --body "Version `${{ github.ref_name }}` is released, update index file accordingly."
