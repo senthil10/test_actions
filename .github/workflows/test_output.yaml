@@ -1,0 +1,12 @@
+name: Test output
+on: workflow_dispatch
+
+jobs:
+  test_output:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Try setting output
+        id: updater
+        run: echo "print_value=Content is same" >> $GITHUB_OUTPUT
+      - name: Print the output
+        run: echo "${{ steps.updater.outputs.print_value }}"
