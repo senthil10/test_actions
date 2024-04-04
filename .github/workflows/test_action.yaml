@@ -25,7 +25,7 @@ jobs:
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
       - name: Update the file and push to develop
         run: |
-          echo "This is a test file" > test_file.txt
+          echo "This is a test file updated" > test_file.txt
           git add test_file.txt
           git commit -m "Action file update"
           git push origin develop
