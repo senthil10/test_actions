@@ -1,5 +1,8 @@
 name: Test output
-on: workflow_dispatch
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
   test_output:
@@ -10,3 +13,7 @@ jobs:
         run: echo "print_value=Content is same" >> $GITHUB_OUTPUT
       - name: Print the output
         run: echo "${{ steps.updater.outputs.print_value }}"
+      - name: Dump github context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
