@@ -16,6 +16,8 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
       - name: Test Git commands
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "This is a test file" > test_file.txt
           git config --local user.name  ${{ github.actor }}        
