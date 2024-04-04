@@ -37,4 +37,4 @@ jobs:
         if: ${{ steps.index_updater.outputs.status == 'updated' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr create --base main --head develop --title "Update EBI index - ${{ steps.today.outputs.date }}"
+        run: gh pr create --base main --head develop --title "Update EBI index - ${{ steps.today.outputs.date }}" --body "Version `${{ github.ref_name }}` is released, update index file accordingly."
