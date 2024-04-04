@@ -25,6 +25,7 @@ jobs:
         id: index_updater
         run: echo "status=$(python EBI/update_index_json.py --release ${{ github.ref_name }} --release-date ${{ steps.today.outputs.date }})" >> $GITHUB_OUTPUT
       - name: Test step
+        if: ${{ steps.index_updater.outputs.status == 'updated' }}
         run: echo ${{ steps.index_updater.outputs.status }}
         # - name: Commit new change and push to develop branch
       #   if: ${{ steps.index_updater.outputs.status == 'updated' }}
