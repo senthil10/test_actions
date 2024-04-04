@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - develop
   release:
     types: [published]
 
@@ -15,56 +14,21 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
-      - name: Test Git commands
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          ref: develop
+      - name: Set local git config
         run: |
           git branch
-          echo "This is a test file" > test_file.txt
           git config --local user.name  ${{ github.actor }}        
           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+      - name: Update the file and push to develop
+        run: |
+          echo "This is a test file" > test_file.txt
           git add test_file.txt
-          git commit -m "Action file test"
-          gh pr create --base develop --head develop -f
-
-#git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-
-#      - name: Dump GitHub context
-#        env:
-#          GITHUB_CONTEXT: ${{ toJson(github) }}
-#        run: echo "$GITHUB_CONTEXT"
-#      - name: Dump job context
-#        env:
-#          JOB_CONTEXT: ${{ toJson(job) }}
-#        run: echo "$JOB_CONTEXT"
-#      - name: Dump steps context
-#        env:
-#          STEPS_CONTEXT: ${{ toJson(steps) }}
-#        run: echo "$STEPS_CONTEXT"
-#      - name: Dump runner context
-#        env:
-#          RUNNER_CONTEXT: ${{ toJson(runner) }}
-#        run: echo "$RUNNER_CONTEXT"
-#      - name: Dump strategy context
-#        env:
-#          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-#        run: echo "$STRATEGY_CONTEXT"
-#      - name: Dump matrix context
-#        env:
-#          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-#        run: echo "$MATRIX_CONTEXT"
-#      - name: Dump output context
-#        env:
-#          OUTPUT_CONTEXT: ${{ toJson(steps.meta.outputs) }}
-#        run: echo "$OUTPUT_CONTEXT"
-#      - name: Show set env variable
-#        env:
-#          HUGO_ENV: ${{ github.event_name == 'release' && format('{0}-{1}', 'production', github.ref_name)
-#                  || github.ref_name == 'main' && format('{0}-{1}', 'production', github.sha)
-#                  || format('{0}-{1}', 'development', github.sha) }}
-#        run: echo "The hugo env is - $HUGO_ENV"
-#      - name: Show custom variables
-#        run: |
-#          echo "${{ github.ref_name == 'main' && 'production' || github.event_name == 'release' && 'production' || 'development' }}"
-#          echo "This is what the version is ${{ github.event_name == 'release' && github.ref_name || github.sha }}"
-#          echo "The git ref name is: ${{ github.ref_name }}"
+          git commit -m "Action file update"
+          git push origin develop
+      - name: Make pull request to main branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr create --base main --head develop --title "Action PR" --body "Updating the file"
