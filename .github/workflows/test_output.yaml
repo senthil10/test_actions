@@ -1,8 +1,5 @@
 name: Test output
 on:
-  push:
-    branches:
-    - main
   release:
     types: [published]
   workflow_dispatch:
@@ -20,3 +17,12 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - name: Test Git commands
+        run: |
+          echo "This is a test file $(date)" >> test_file.txt
+          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git add test_file.txt
+          git commit -m "Action file test"
+          git push origin ${{ github.ref_name }}
