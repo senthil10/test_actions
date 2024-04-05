@@ -7,6 +7,8 @@ on:
 jobs:
   test_output:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Try setting output
         id: updater
