@@ -28,5 +28,5 @@ jobs:
           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
           git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git add test_file.txt
-          git commit -m "Action file test"
+          git commit -m "Action file test" -s
           git push origin ${{ github.ref_name }}
