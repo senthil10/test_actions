@@ -16,22 +16,23 @@ jobs:
         run: echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
       - name: Check out the repo
         uses: actions/checkout@v3
-        with:
-          ref: develop
       - name: Run python script to get new dates
         id: index_updater
         run: echo "status=$(python EBI/update_index_json.py --release ${{ github.ref_name }} --release-date ${{ steps.today.outputs.date }})" >> $GITHUB_OUTPUT
-      - name: Commit new change and push to develop branch
-        if: ${{ steps.index_updater.outputs.status == 'updated' }}
-        run: |
-          git config --local user.name  ${{ github.actor }}        
-          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
-          git remote set-url origin https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add EBI/pathogens_portal_index.json
-          git commit -m "EBI index updated"
-          git push origin develop
-      - name: Make pull request to main branch
+      - name: Push the changes on successful update
         if: ${{ steps.index_updater.outputs.status == 'updated' }}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr create --base main --head develop --title "Update EBI index - ${{ steps.today.outputs.date }}" --body "Version `${{ github.ref_name }}` is released, update index file accordingly."
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FILE_TO_COMMIT: EBI/pathogens_portal_index.json
+          DESTINATION_BRANCH: develop
+        run: |
+          export TODAY=${{ steps.today.outputs.date }}
+          export MESSAGE="Update EBI index - $TODAY"
+          export SHA=$( git rev-parse $DESTINATION_BRANCH:$FILE_TO_COMMIT )
+          export CONTENT=$( base64 -i $FILE_TO_COMMIT )
+          gh api --method PUT /repos/:owner/:repo/contents/$FILE_TO_COMMIT \
+            --field message="$MESSAGE" \
+            --field content="$CONTENT" \
+            --field encoding="base64" \
+            --field branch="$DESTINATION_BRANCH" \
+            --field sha="$SHA"
