@@ -11,14 +11,14 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Store today date for further use
-        id: today
-        run: echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
       - name: Check out the repo
         uses: actions/checkout@v3
       - name: Run python script to get new dates
         id: index_updater
-        run: echo "status=$(python EBI/update_index_json.py --release ${{ github.ref_name }} --release-date ${{ steps.today.outputs.date }})" >> $GITHUB_OUTPUT
+        run: |
+          RELEASE=$(gh release list -L 1 --json tagName --jq '.[0].tagName')
+          RELEASE_DATE=$(gh release list -L 1 --json publishedAt --jq '.[0].publishedAt[:10]')
+          echo "status=$(python EBI/update_index_json.py --release $RELEASE --release-date $RELEASE_DATE)" >> $GITHUB_OUTPUT
       - name: Push the changes on successful update
         if: ${{ steps.index_updater.outputs.status == 'updated' }}
         env:
@@ -26,7 +26,7 @@ jobs:
           FILE_TO_COMMIT: EBI/pathogens_portal_index.json
           DESTINATION_BRANCH: develop
         run: |
-          export TODAY=${{ steps.today.outputs.date }}
+          export TODAY=$(date +%Y-%m-%d)
           export MESSAGE="Update EBI index - $TODAY"
           export SHA=$( git rev-parse $DESTINATION_BRANCH:$FILE_TO_COMMIT )
           export CONTENT=$( base64 -i $FILE_TO_COMMIT )
